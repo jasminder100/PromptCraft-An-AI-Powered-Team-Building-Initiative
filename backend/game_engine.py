@@ -1,0 +1,460 @@
+import numpy as np
+import re
+from difflib import SequenceMatcher
+from collections import Counter
+import os
+from dotenv import load_dotenv
+import base64
+import io
+from PIL import Image
+
+# Try to load advanced NLP libraries
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
+
+try:
+    import spacy
+    SPACY_AVAILABLE = True
+except ImportError:
+    SPACY_AVAILABLE = False
+
+# Import Google GenAI
+try:
+    from google import genai
+    from google.genai import types
+    GOOGLE_GENAI_AVAILABLE = True
+except ImportError:
+    GOOGLE_GENAI_AVAILABLE = False
+
+load_dotenv()
+
+class AIGameEngine:
+    def __init__(self):
+        self.gemini_api_key = os.getenv("GOOGLE_GENAI_API_KEY")
+       
+        print(f"= Checking API keys...")
+        print(f"Gemini API Key: {' Found' if self.gemini_api_key else 'L Missing'}")
+       
+        # Initialize Google GenAI client for image generation
+        self.genai_client = None
+        if self.gemini_api_key and GOOGLE_GENAI_AVAILABLE:
+            try:
+                self.genai_client = genai.Client(api_key=self.gemini_api_key)
+                print(" Google GenAI client initialized successfully!")
+            except Exception as e:
+                print(f"  Failed to initialize Google GenAI client: {e}")
+        elif not self.gemini_api_key:
+            print("L Gemini API key not found in environment variables")
+        elif not GOOGLE_GENAI_AVAILABLE:
+            print("L Google GenAI library not available. Run: pip install google-genai")
+       
+        # Load NLP models
+        self.text_models = self._load_text_models()
+        self.common_words = self._get_common_words()
+
+    def _load_text_models(self):
+        """Load available text similarity models"""
+        models = {}
+       
+        if SENTENCE_TRANSFORMERS_AVAILABLE:
+            try:
+                models['sentence_transformer'] = SentenceTransformer('all-MiniLM-L6-v2')
+                print(" Sentence Transformer model loaded!")
+            except Exception as e:
+                print(f"  Sentence Transformer loading failed: {e}")
+       
+        if SPACY_AVAILABLE:
+            try:
+                models['spacy'] = spacy.load("en_core_web_md")
+                print(" spaCy model loaded!")
+            except Exception as e:
+                print(f"  spaCy loading failed: {e}")
+       
+        return models
+
+    def generate_image(self, prompt: str) -> dict:
+        """Generate image using Google Imagen 4.0"""
+        if not self.gemini_api_key:
+            return {"success": False, "error": "Gemini API key not configured. Please set GOOGLE_GENAI_API_KEY in your .env file."}
+           
+        if not self.genai_client:
+            return {"success": False, "error": "Google GenAI client not available. Please check your API key and ensure google-genai is installed."}
+       
+        try:
+            print(f"<¨ Generating 1K resolution image with Google Imagen 4.0...")
+            print(f"=Ý Prompt: {prompt}")
+           
+            # Generate image using Google GenAI
+            image_response = self.genai_client.models.generate_images(
+                model="imagen-4.0-generate-001",
+                prompt=prompt,
+                config=types.GenerateImagesConfig(
+                    aspect_ratio="16:9",
+                    number_of_images=1,
+                    image_size="1K"  # 1024x1024 resolution
+                ),
+            )
+           
+            if image_response and image_response.generated_images:
+                generated_image = image_response.generated_images[0]
+               
+                # Convert PIL Image to base64 data URL
+                pil_image = generated_image.image._pil_image
+               
+                # Convert to RGB if necessary (for JPEG compatibility)
+                if pil_image.mode != "RGB":
+                    pil_image = pil_image.convert("RGB")
+               
+                # Save to bytes buffer
+                img_buffer = io.BytesIO()
+                pil_image.save(img_buffer, format='PNG', quality=95)
+                img_buffer.seek(0)
+               
+                # Convert to base64
+                img_base64 = base64.b64encode(img_buffer.getvalue()).decode()
+                image_url = f"data:image/png;base64,{img_base64}"
+               
+                print(" Image generated successfully with Google Imagen 4.0!")
+               
+                return {
+                    "success": True,
+                    "image_url": image_url,
+                    "model": "imagen-4.0-generate-001",
+                    "resolution": "1K",
+                    "aspect_ratio": "16:9",
+                    "provider": "Google Imagen 4.0"
+                }
+            else:
+                return {"success": False, "error": "No image generated by Imagen 4.0"}
+               
+        except Exception as e:
+            print(f"L Google Imagen 4.0 generation error: {e}")
+            return {"success": False, "error": f"Google Imagen 4.0 generation failed: {str(e)}"}
+
+    def calculate_text_similarity(self, target_prompt: str, guess_prompt: str) -> dict:
+        """Calculate similarity and word analysis using built-in algorithm"""
+        try:
+            print(f">à Analyzing similarity between prompts...")
+            print(f"Target: {target_prompt}")
+            print(f"Guess: {guess_prompt}")
+           
+            # Calculate similarity score
+            similarity_score = self._calculate_meaningful_words_similarity(target_prompt, guess_prompt)
+           
+            # Get grade
+            grade = self.get_similarity_grade(similarity_score)
+           
+            # Get detailed word analysis for both guess and target prompts
+            detailed_word_analysis = self.get_detailed_word_analysis(target_prompt, guess_prompt)
+           
+            print(f" Similarity calculated: {similarity_score:.3f} ({grade})")
+           
+            return {
+                "success": True,
+                "similarity_score": similarity_score,
+                "grade": grade,
+                "word_analysis": detailed_word_analysis
+            }
+        except Exception as e:
+            print(f"L Similarity calculation error: {e}")
+            return {"success": False, "error": str(e)}
+
+    def _calculate_meaningful_words_similarity(self, target: str, guess: str) -> float:
+        """Calculate similarity based on meaningful words only"""
+        target_words = self._get_meaningful_words(self._clean_text(target))
+        guess_words = self._get_meaningful_words(self._clean_text(guess))
+       
+        if not target_words and not guess_words:
+            return 0.0
+        if not target_words:
+            return 0.0
+        if not guess_words:
+            return 0.05
+
+        exact_match_score = self._calculate_exact_meaningful_matches(target_words, guess_words)
+        order_score = self._calculate_meaningful_word_order(target_words, guess_words)
+        length_score = self._calculate_meaningful_length_similarity(target_words, guess_words)
+        semantic_score = self._calculate_meaningful_semantic_similarity(target_words, guess_words)
+       
+        final_score = (
+            exact_match_score * 0.80 +
+            order_score * 0.10 +
+            length_score * 0.05 +
+            semantic_score * 0.05
+        )
+       
+        return self._apply_meaningful_scoring_curve(final_score)
+
+    def _get_meaningful_words(self, text: str) -> list:
+        """Extract meaningful words only"""
+        words = text.lower().split()
+        return [word for word in words if word not in self.common_words and len(word) > 2]
+
+    def _calculate_exact_meaningful_matches(self, target_words: list, guess_words: list) -> float:
+        """Calculate exact match ratio"""
+        if not target_words:
+            return 0.0
+       
+        target_counter = Counter(target_words)
+        guess_counter = Counter(guess_words)
+       
+        exact_matches = 0
+        for word in target_counter:
+            if word in guess_counter:
+                exact_matches += min(target_counter[word], guess_counter[word])
+       
+        match_ratio = exact_matches / len(target_words)
+       
+        if exact_matches == len(target_words):
+            if len(guess_words) == len(target_words):
+                return 1.0
+            else:
+                penalty = min(0.05, (abs(len(guess_words) - len(target_words)) * 0.02))
+                return max(0.95, 1.0 - penalty)
+       
+        return match_ratio
+
+    def _calculate_meaningful_word_order(self, target_words: list, guess_words: list) -> float:
+        """Calculate word order similarity"""
+        common_meaningful_words = set(target_words) & set(guess_words)
+        if len(common_meaningful_words) < 2:
+            return 1.0
+       
+        target_positions = {word: i for i, word in enumerate(target_words) if word in common_meaningful_words}
+        guess_positions = {word: i for i, word in enumerate(guess_words) if word in common_meaningful_words}
+       
+        order_score = 0.0
+        comparisons = 0
+       
+        words_list = list(common_meaningful_words)
+        for i in range(len(words_list)):
+            for j in range(i + 1, len(words_list)):
+                word1, word2 = words_list[i], words_list[j]
+               
+                if word1 in target_positions and word2 in target_positions and \
+                   word1 in guess_positions and word2 in guess_positions:
+                    target_order = target_positions[word1] < target_positions[word2]
+                    guess_order = guess_positions[word1] < guess_positions[word2]
+                    if target_order == guess_order:
+                        order_score += 1
+                    comparisons += 1
+       
+        return order_score / comparisons if comparisons > 0 else 1.0
+
+    def _calculate_meaningful_length_similarity(self, target_words: list, guess_words: list) -> float:
+        """Calculate length similarity"""
+        if not target_words:
+            return 0.0
+       
+        target_len = len(target_words)
+        guess_len = len(guess_words)
+       
+        if target_len == guess_len:
+            return 1.0
+       
+        return min(target_len, guess_len) / max(target_len, guess_len)
+
+    def _calculate_meaningful_semantic_similarity(self, target_words: list, guess_words: list) -> float:
+        """Calculate semantic similarity for unmatched words"""
+        target_set = set(target_words)
+        guess_set = set(guess_words)
+       
+        unmatched_target = target_set - guess_set
+        unmatched_guess = guess_set - target_set
+       
+        if not unmatched_target or not unmatched_guess:
+            return 1.0
+       
+        semantic_matches = 0
+        for target_word in unmatched_target:
+            for guess_word in unmatched_guess:
+                if self._are_synonyms(target_word, guess_word):
+                    semantic_matches += 1
+                    break
+       
+        return semantic_matches / len(unmatched_target) if unmatched_target else 1.0
+
+    def _apply_meaningful_scoring_curve(self, raw_score: float) -> float:
+        """Apply scoring curve"""
+        score = max(0.0, min(1.0, raw_score))
+       
+        if score >= 0.95:
+            return score
+        elif score >= 0.85:
+            return 0.85 + (score - 0.85) * 1.0
+        elif score >= 0.70:
+            return 0.65 + (score - 0.70) * 1.33
+        elif score >= 0.50:
+            return 0.40 + (score - 0.50) * 1.25
+        elif score >= 0.30:
+            return 0.20 + (score - 0.30) * 1.0
+        else:
+            return score * 0.67
+
+    def _clean_text(self, text: str) -> str:
+        """Clean text"""
+        text = text.lower()
+        text = re.sub(r'[^\w\s-]', '', text)
+        text = re.sub(r'\s+', ' ', text)
+        return text.strip()
+
+    def _are_synonyms(self, word1: str, word2: str) -> bool:
+        """Check if words are synonyms"""
+        synonym_groups = [
+            {'ocean', 'sea', 'water', 'lake', 'river'},
+            {'dragon', 'beast', 'creature', 'monster'},
+            {'flying', 'soaring', 'gliding', 'hovering'},
+            {'golden', 'gold', 'yellow', 'amber'},
+            {'sunset', 'dusk', 'evening', 'twilight'},
+            {'forest', 'woods', 'trees', 'woodland'},
+            {'mountain', 'peak', 'hill', 'summit'},
+            {'castle', 'palace', 'fortress', 'tower'},
+            {'magical', 'mystical', 'enchanted', 'fantasy'},
+            {'beautiful', 'gorgeous', 'stunning', 'magnificent'},
+            {'dark', 'black', 'shadowy', 'dim'},
+            {'bright', 'light', 'luminous', 'glowing'},
+            {'person', 'human', 'man', 'woman', 'figure'},
+            {'car', 'vehicle', 'automobile', 'auto'},
+            {'city', 'urban', 'metropolitan', 'town'},
+            {'house', 'home', 'building', 'structure'}
+        ]
+       
+        for group in synonym_groups:
+            if word1 in group and word2 in group:
+                return True
+       
+        return False
+
+    def get_detailed_word_analysis(self, target_prompt: str, guess_prompt: str) -> dict:
+        """Generate detailed word analysis for both the guess prompt and the target prompt"""
+        cleaned_target_prompt = self._clean_text(target_prompt)
+        cleaned_guess_prompt = self._clean_text(guess_prompt)
+
+        target_all_words = cleaned_target_prompt.split()
+        guess_all_words = cleaned_guess_prompt.split()
+
+        target_meaningful_set = set(self._get_meaningful_words(cleaned_target_prompt))
+        guess_meaningful_set = set(self._get_meaningful_words(cleaned_guess_prompt))
+
+        # Analysis for User's Guess
+        guess_analysis = []
+        matched_target_words_for_prediction = set()
+
+        for guess_word in guess_all_words:
+            status = 'common'
+            reason = 'short_word_or_common'
+            if guess_word not in self.common_words and len(guess_word) > 2:
+                if guess_word in target_meaningful_set:
+                    status = 'correct'
+                    reason = 'exact_match'
+                    matched_target_words_for_prediction.add(guess_word)
+                elif self._is_similar_meaningful_word(guess_word, target_meaningful_set):
+                    status = 'similar'
+                    similar_word = self._find_most_similar_word(guess_word, target_meaningful_set)
+                    reason = f'similar_to_{similar_word}'
+                    matched_target_words_for_prediction.add(similar_word)
+                else:
+                    status = 'wrong'
+                    reason = 'not_found'
+           
+            guess_analysis.append({
+                'word': guess_word,
+                'status': status,
+                'reason': reason
+            })
+
+        # Analysis for Target Prompt
+        target_prompt_analysis = []
+        temp_matched_for_target = set(matched_target_words_for_prediction)
+
+        for target_word in target_all_words:
+            status = 'common'
+           
+            if target_word not in self.common_words and len(target_word) > 2:
+                if target_word in temp_matched_for_target:
+                    status = 'predicted'
+                    temp_matched_for_target.remove(target_word)
+                else:
+                    status = 'unpredicted'
+           
+            target_prompt_analysis.append({
+                'word': target_word,
+                'status': status
+            })
+
+        # Calculate exact matches and total meaningful words for score display
+        exact_matches_count = len(target_meaningful_set.intersection(guess_meaningful_set))
+        total_target_meaningful_count = len(target_meaningful_set)
+       
+        return {
+            'guess_analysis': guess_analysis,
+            'target_prompt_analysis': target_prompt_analysis,
+            'exact_matches': exact_matches_count,
+            'total_target_meaningful': total_target_meaningful_count
+        }
+
+    def _get_common_words(self) -> set:
+        """Get common words set"""
+        return {
+            'a', 'an', 'the', 'and', 'or', 'but', 'nor', 'so', 'yet',
+            'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'up', 'about',
+            'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between',
+            'among', 'under', 'over', 'near', 'behind', 'beside', 'across', 'around',
+            'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
+            'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can',
+            'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them',
+            'my', 'your', 'his', 'its', 'our', 'their', 'this', 'that', 'these', 'those',
+            'very', 'really', 'quite', 'rather', 'too', 'so', 'just', 'only', 'also'
+        }
+
+    def _is_similar_meaningful_word(self, word: str, target_words: set) -> bool:
+        """Check if word is similar to target words"""
+        for target_word in target_words:
+            if len(word) >= 3 and len(target_word) >= 3:
+                similarity = SequenceMatcher(None, word, target_word).ratio()
+                if similarity >= 0.7:
+                    return True
+           
+            if self._are_synonyms(word, target_word):
+                return True
+       
+        return False
+
+    def _find_most_similar_word(self, word: str, target_words: set) -> str:
+        """Find most similar word"""
+        best_similarity = 0
+        best_word = ""
+       
+        for target_word in target_words:
+            if len(word) >= 3 and len(target_word) >= 3:
+                similarity = SequenceMatcher(None, word, target_word).ratio()
+                if similarity > best_similarity:
+                    best_similarity = similarity
+                    best_word = target_word
+           
+            if self._are_synonyms(word, target_word):
+                return target_word
+       
+        return best_word if best_word else word
+
+    def get_similarity_grade(self, score: float) -> str:
+        """Convert score to grade"""
+        if score >= 0.98: return "A+"
+        elif score >= 0.92: return "A"
+        elif score >= 0.85: return "A-"
+        elif score >= 0.78: return "B+"
+        elif score >= 0.70: return "B"
+        elif score >= 0.60: return "B-"
+        elif score >= 0.50: return "C+"
+        elif score >= 0.40: return "C"
+        elif score >= 0.30: return "C-"
+        elif score >= 0.20: return "D+"
+        elif score >= 0.15: return "D"
+        elif score >= 0.10: return "D-"
+        else: return "F"
+
+# Global instance
+game_engine = AIGameEngine()
