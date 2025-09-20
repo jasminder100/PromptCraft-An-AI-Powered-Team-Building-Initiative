@@ -1,0 +1,542 @@
+.instructions-page {
+    min-height: 100vh;
+    padding: 120px 20px 40px;
+    position: relative;
+  }
+  
+  .loading-instructions {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .loading-container {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    border-radius: 24px;
+    padding: 48px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .loading-container h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 16px 0 8px 0;
+  }
+  
+  .loading-container p {
+    color: rgba(51, 51, 51, 0.7);
+    margin: 0;
+  }
+  
+  .instructions-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .instructions-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  
+  .header-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border-radius: 50%;
+    margin-bottom: 24px;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .target-icon {
+    color: white;
+    size: 32;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+  }
+  
+  .instructions-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .instructions-subtitle {
+    font-size: 1.25rem;
+    color: rgba(51, 51, 51, 0.8);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  
+  .session-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.3);
+    border-radius: 20px;
+    color: #28a745;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  
+  .status-icon.success {
+    color: #28a745;
+  }
+  
+  .instructions-content {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin-bottom: 48px;
+  }
+  
+  .game-rules {
+    padding: 40px;
+  }
+  
+  .rules-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    justify-content: center;
+  }
+  
+  .rules-icon {
+    color: #4facfe;
+    size: 32;
+    filter: drop-shadow(0 0 10px rgba(79, 172, 254, 0.3));
+  }
+  
+  .rules-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+  }
+  
+  .rules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+  }
+  
+  .rule-step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 24px;
+    background: rgba(79, 172, 254, 0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(79, 172, 254, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .rule-step:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(79, 172, 254, 0.15);
+    border-color: rgba(79, 172, 254, 0.3);
+  }
+  
+  .step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 1.125rem;
+    flex-shrink: 0;
+  }
+  
+  .step-content {
+    flex: 1;
+  }
+  
+  .step-icon {
+    color: #4facfe;
+    margin-bottom: 8px;
+  }
+  
+  .step-content h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  
+  .step-content p {
+    color: rgba(51, 51, 51, 0.7);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0;
+  }
+  
+  .info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 32px;
+  }
+  
+  .guide-header,
+  .tips-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  
+  .guide-icon,
+  .tips-icon {
+    color: #667eea;
+    filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.3));
+  }
+  
+  .guide-header h3,
+  .tips-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+  
+  .score-levels {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .score-level {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border-left: 4px solid;
+  }
+  
+  .grade-a {
+    background: rgba(40, 167, 69, 0.1);
+    border-left-color: #28a745;
+  }
+  
+  .grade-b {
+    background: rgba(79, 172, 254, 0.1);
+    border-left-color: #4facfe;
+  }
+  
+  .grade-c {
+    background: rgba(255, 193, 7, 0.1);
+    border-left-color: #ffc107;
+  }
+  
+  .grade-d {
+    background: rgba(255, 87, 34, 0.1);
+    border-left-color: #ff5722;
+  }
+  
+  .grade-f {
+    background: rgba(220, 53, 69, 0.1);
+    border-left-color: #dc3545;
+  }
+  
+  .grade {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  .description {
+    font-size: 0.875rem;
+    color: rgba(51, 51, 51, 0.7);
+  }
+  
+  .scoring-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 8px;
+  }
+  
+  .note-icon {
+    color: #ffc107;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  
+  .scoring-note p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: rgba(51, 51, 51, 0.8);
+  }
+  
+  .tips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .tip-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 16px;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+  }
+  
+  .tip-icon {
+    color: #667eea;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  
+  .tip-item strong {
+    display: block;
+    color: #333;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+  }
+  
+  .tip-item p {
+    color: rgba(51, 51, 51, 0.7);
+    font-size: 0.8rem;
+    margin: 0;
+    line-height: 1.4;
+  }
+  
+  .word-highlighting {
+    text-align: center;
+    padding: 32px;
+  }
+  
+  .highlight-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+  }
+  
+  .highlight-description {
+    font-size: 1rem;
+    color: rgba(51, 51, 51, 0.7);
+    margin-bottom: 24px;
+  }
+  
+  .highlight-examples {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  
+  .highlight-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .word-correct {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  .word-similar {
+    background-color: #90EE90;
+    color: #2d5016;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  .word-wrong {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  .word-neutral {
+    color: #6c757d;
+    padding: 8px 16px;
+    border: 2px solid #6c757d;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background: white;
+  }
+  
+  .highlight-desc {
+    font-size: 0.8rem;
+    color: rgba(51, 51, 51, 0.7);
+    text-align: center;
+  }
+  
+  .game-preview {
+    padding: 32px;
+  }
+  
+  .preview-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  
+  .preview-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: center;
+  }
+  
+  .preview-image {
+    text-align: center;
+  }
+  
+  .preview-img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  .preview-info h4 {
+    font-size: 1.125rem;
+    color: #333;
+    margin-bottom: 12px;
+  }
+  
+  .preview-info p {
+    color: rgba(51, 51, 51, 0.7);
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+  
+  .preview-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .stat {
+    padding: 8px 12px;
+    background: rgba(79, 172, 254, 0.1);
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  
+  .stat strong {
+    color: #4facfe;
+  }
+  
+  .start-section {
+    text-align: center;
+    padding: 40px;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 24px;
+    border: 2px solid rgba(102, 126, 234, 0.1);
+  }
+  
+  .team-ready {
+    margin-bottom: 32px;
+  }
+  
+  .ready-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+  }
+  
+  .ready-subtitle {
+    font-size: 1.125rem;
+    color: rgba(51, 51, 51, 0.7);
+    margin: 0;
+    line-height: 1.5;
+  }
+  
+  .start-btn {
+    min-width: 200px;
+    padding: 16px 32px;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  
+  .start-btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+  
+  @media (max-width: 1024px) {
+    .info-cards {
+      grid-template-columns: 1fr;
+    }
+   
+    .preview-content {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .instructions-page {
+      padding: 100px 15px 30px;
+    }
+   
+    .instructions-title {
+      font-size: 2.5rem;
+    }
+   
+    .rules-grid {
+      grid-template-columns: 1fr;
+    }
+   
+    .info-cards {
+      grid-template-columns: 1fr;
+    }
+   
+    .highlight-examples {
+      flex-direction: column;
+      align-items: center;
+    }
+   
+    .ready-title {
+      font-size: 1.5rem;
+    }
+   
+    .start-btn {
+      width: 100%;
+      min-width: auto;
+    }
+  }
