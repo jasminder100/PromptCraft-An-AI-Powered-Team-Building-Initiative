@@ -1,0 +1,343 @@
+.navbar {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 16px 24px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.6); /* Lighter, more opaque background for better contrast */
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8); /* More defined border */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+ 
+  .navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 20px;
+  }
+ 
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+ 
+  .navbar-brand:hover {
+    transform: translateY(-1px);
+  }
+ 
+  .brand-icon {
+    color: #4A74F3; /* Brand blue */
+    filter: drop-shadow(0 0 10px rgba(74, 116, 243, 0.5));
+  }
+ 
+  .brand-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #2649B2 0%, #4A74F3 100%); /* Darker blue gradient for text */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+ 
+  .connection-status {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+  }
+ 
+  .connection-icon {
+    transition: all 0.3s ease;
+  }
+ 
+  .connection-icon.connected {
+    color: #28a745; /* Standard green */
+    filter: drop-shadow(0 0 5px rgba(40, 167, 69, 0.5));
+  }
+ 
+  .connection-icon.disconnected {
+    color: #dc3545; /* Standard red */
+    filter: drop-shadow(0 0 5px rgba(220, 53, 69, 0.5));
+  }
+ 
+  .navbar-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+ 
+  .phase-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.4); /* Lighter background */
+    border-radius: 16px;
+    border: 2px solid;
+    backdrop-filter: blur(10px);
+  }
+ 
+  .phase-icon {
+    font-size: 1rem;
+  }
+ 
+  .phase-text {
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #2649B2; /* Dark blue text */
+  }
+ 
+  .team-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(142, 125, 227, 0.1); /* Subtle purple background */
+    border-radius: 20px;
+    border: 1px solid rgba(142, 125, 227, 0.2);
+  }
+ 
+  .team-label {
+    font-size: 0.875rem;
+    color: #555; /* Darker text */
+    font-weight: 500;
+  }
+ 
+  .team-name {
+    font-weight: 600;
+    color: #8E7DE3; /* Brand purple */
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+ 
+  .game-progress {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: rgba(40, 167, 69, 0.1); /* Light green background */
+    border-radius: 12px;
+    border: 1px solid rgba(40, 167, 69, 0.2);
+  }
+ 
+  .progress-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #28a745; /* Standard green */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+ 
+  .progress-bar {
+    width: 60px;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.2); /* Darker track for visibility */
+    border-radius: 2px;
+    overflow: hidden;
+  }
+ 
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+ 
+  .score-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+ 
+  .best-score {
+    font-size: 0.75rem;
+    color: #555; /* Darker text */
+    font-weight: 500;
+  }
+ 
+  .best-grade {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    background: rgba(255, 255, 255, 0.4); /* Lighter background */
+    border-radius: 4px;
+  }
+ 
+  .final-score {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(157, 92, 230, 0.1); /* Subtle purple background */
+    border-radius: 20px;
+    border: 1px solid rgba(157, 92, 230, 0.2);
+  }
+ 
+  .final-score-label {
+    font-size: 0.875rem;
+    color: #555; /* Darker text */
+    font-weight: 500;
+  }
+ 
+  .final-score-value {
+    font-weight: 700;
+    font-size: 0.875rem;
+  }
+ 
+  .navbar-actions {
+    display: flex;
+    gap: 12px;
+  }
+ 
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.4); /* Lighter background */
+    border: 1px solid rgba(255, 255, 255, 0.6); /* More defined border */
+    border-radius: 12px;
+    color: #333; /* Darker text */
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    font-size: 0.875rem;
+  }
+ 
+  .nav-btn:hover {
+    background: rgba(255, 255, 255, 0.6); /* More opaque on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+ 
+  .nav-btn.active {
+    background: rgba(74, 116, 243, 0.2); /* Brand blue active state */
+    border-color: rgba(74, 116, 243, 0.4);
+    color: #4A74F3; /* Brand blue text */
+  }
+ 
+  .home-btn {
+    background: rgba(74, 116, 243, 0.1); /* Subtle blue background */
+    border-color: rgba(74, 116, 243, 0.3);
+    color: #4A74F3; /* Brand blue */
+  }
+ 
+  .home-btn:hover {
+    background: rgba(74, 116, 243, 0.2);
+  }
+ 
+  .leaderboard-btn {
+    background: rgba(255, 215, 0, 0.1); /* Subtle gold background */
+    border-color: rgba(255, 215, 0, 0.3);
+    color: #B58D00; /* Darker gold for text */
+  }
+ 
+  .leaderboard-btn:hover {
+    background: rgba(255, 215, 0, 0.2);
+  }
+ 
+  .leaderboard-btn.active {
+    background: rgba(255, 215, 0, 0.3);
+    border-color: rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+  }
+ 
+  @media (max-width: 1024px) {
+    .navbar-container {
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+   
+    .navbar-info {
+      order: 3;
+      flex-basis: 100%;
+      justify-content: center;
+      gap: 12px;
+    }
+   
+    .team-name {
+      max-width: 100px;
+    }
+  }
+ 
+  @media (max-width: 768px) {
+    .navbar {
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      padding: 12px 16px;
+    }
+   
+    .navbar-container {
+      gap: 8px;
+    }
+   
+    .brand-text {
+      font-size: 1.25rem;
+    }
+   
+    .navbar-info {
+      gap: 8px;
+    }
+   
+    .nav-btn span {
+      display: none;
+    }
+   
+    .nav-btn {
+      padding: 8px;
+      min-width: 40px;
+      justify-content: center;
+    }
+   
+    .team-name {
+      max-width: 80px;
+    }
+   
+    .phase-indicator,
+    .team-info,
+    .game-progress,
+    .final-score {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+   
+    .progress-bar {
+      width: 40px;
+    }
+  }
+ 
+  @media (max-width: 480px) {
+    .navbar-info {
+      flex-direction: column;
+      gap: 6px;
+    }
+   
+    .phase-indicator,
+    .team-info,
+    .game-progress,
+    .final-score {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+    }
+   
+    .brand-text {
+      display: none;
+    }
+  }
